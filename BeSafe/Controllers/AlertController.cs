@@ -4,16 +4,24 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BeSafe.Data.Repository;
 using BeSafe.Models;
+using BeSafe.Services;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AlertController : ControllerBase
 {
-    private readonly IAlertRepository _alertRepository;
+      private readonly IAlertRepository _alertRepository;
+    private readonly RabbitMQService _rabbitMQService;
+    private readonly ILogger<AlertController> _logger;
     
-    public AlertController(IAlertRepository alertRepository)
+    public AlertController(
+        IAlertRepository alertRepository,
+        RabbitMQService rabbitMQService,
+        ILogger<AlertController> logger)
     {
         _alertRepository = alertRepository;
+        _rabbitMQService = rabbitMQService;
+        _logger = logger;
     }
     
     [HttpGet]
@@ -46,11 +54,28 @@ public class AlertController : ControllerBase
     {
         try
         {
+            alert.DataEnvio = DateTime.UtcNow; // Garantir data atual
             var createdAlert = await _alertRepository.AddAsync(alert);
+            
+            var alertMessage = new AlertMessageDto
+            {
+                Id = createdAlert.Id,
+                AreaRiscoId = createdAlert.AreaRiscoId,
+                Mensagem = createdAlert.Mensagem,
+                DataEnvio = createdAlert.DataEnvio,
+                TipoAlerta = createdAlert.TipoAlerta,
+                Timestamp = DateTime.Now,
+                Username = "System"
+            };
+            
+            _rabbitMQService.PublishAlert(alertMessage, RabbitMQService.NewAlertRoutingKey);
+            _logger.LogInformation($"Alert created and published: ID {createdAlert.Id}");
+            
             return CreatedAtAction(nameof(GetAlert), new { id = createdAlert.Id }, createdAlert);
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error creating alert");
             return BadRequest(ex.Message);
         }
     }
@@ -64,9 +89,24 @@ public class AlertController : ControllerBase
         try
         {
             await _alertRepository.UpdateAsync(alert);
+            
+            var alertMessage = new AlertMessageDto
+            {
+                Id = alert.Id,
+                AreaRiscoId = alert.AreaRiscoId,
+                Mensagem = alert.Mensagem,
+                DataEnvio = alert.DataEnvio,
+                TipoAlerta = alert.TipoAlerta,
+                Timestamp = DateTime.Now,
+                Username = "System"
+            };
+            
+            _rabbitMQService.PublishAlert(alertMessage, RabbitMQService.UpdatedAlertRoutingKey);
+            _logger.LogInformation($"Alert updated and published: ID {alert.Id}");
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error updating alert");
             return BadRequest(ex.Message);
         }
         
