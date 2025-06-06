@@ -54,10 +54,51 @@ O sistema utiliza mensageria para comunicação entre os componentes, garantindo
 ### Configuração do Banco de Dados
 
 1.  Execute os scripts SQL fornecidos para criar as tabelas e inserir dados iniciais:
-
-
+### Modelagem Banco
+![modelagem](https://i.ibb.co/SXTq6S6y/Screenshot-3.png)
 
  ```
+ CREATE TABLE GS_USUARIO(
+    ID INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    NOME VARCHAR2(255) NOT NULL,
+    CPF VARCHAR2(11),
+    DATA_NASCIMENTO DATE NOT NULL
+);
+
+CREATE TABLE GS_CONTATO(
+    ID INTEGER PRIMARY KEY,
+    EMAIL VARCHAR2(120) NOT NULL,
+    TELEFONE VARCHAR2(11) NOT NULL,
+    CONSTRAINT fk_contato_usuario FOREIGN KEY(ID)
+        REFERENCES GS_USUARIO(ID)
+);
+
+CREATE TABLE GS_ENDERECO_USUARIO(
+    ID INTEGER PRIMARY KEY,
+    LOGRADOURO VARCHAR2(120) NOT NULL,
+    BAIRRO VARCHAR2(80) NOT NULL,
+    CIDADE VARCHAR2(80) NOT NULL,
+    ESTADO VARCHAR2(50) NOT NULL,
+    CONSTRAINT FK_ENDERECO_USUARIO_USUARIO FOREIGN KEY(ID)
+        REFERENCES GS_USUARIO(ID)
+);
+
+CREATE TABLE GS_AREA_RISCO(
+    ID INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    MENSAGEM CLOB NOT NULL,
+    DATA_ENVIO DATE,
+    TIPO_ALERTA NUMBER(2)
+);
+
+CREATE TABLE GS_ALERTA(
+    ID INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    AREA_RISCO_ID INTEGER NOT NULL,
+    MENSAGEM CLOB NOT NULL,
+    DATA_ENVIO DATE NOT NULL,
+    TIPO_ALERTA VARCHAR(40) NOT NULL,
+    CONSTRAINT fk_area_risco_alerta FOREIGN KEY(AREA_RISCO_ID)
+        REFERENCES GS_AREA_RISCO(ID)
+);
  ```
 
 
@@ -66,41 +107,32 @@ O sistema utiliza mensageria para comunicação entre os componentes, garantindo
 1.  Clone o repositório
 
 
-    ```
-    git clone https://github.com/seunome/disaster-alert-system.git
-    cd disaster-alert-system/DisasterAlertSystem
-    
-    ```
+    git clone https://github.com/wedsan/disaster-alert-system.git
+    cd .net-fiap-final-gs/BeSafe
 
 2.  Configure a string de conexão no arquivo  `appsettings.json`
 
 
-    ```
     "ConnectionStrings": {
       "DefaultConnection": "User Id=seu_usuario;Password=sua_senha;Data Source=seu_oracle_datasource;"
     }
-    
-    ```
+
 
 3.  Configure as credenciais do RabbitMQ
 
 
-    ```
     "RabbitMQ": {
       "HostName": "localhost",
       "UserName": "guest",
       "Password": "guest"
     }
-    
-    ```
+
 
 4.  Execute a aplicação
 
 
-    ```
     dotnet run
-    
-    ```
+
 
 5.  Acesse a documentação Swagger:  `https://localhost:5001/swagger`
 
@@ -110,15 +142,12 @@ O sistema utiliza mensageria para comunicação entre os componentes, garantindo
 1.  Navegue para o diretório do serviço
 
 
-    ```
     cd ../AlertNotificationService
-    
-    ```
+
 
 2.  Configure o arquivo  `appsettings.json`  com as informações do banco de dados, RabbitMQ e Azure Communication Services
 
 
-    ```
     {
       "ConnectionStrings": {
         "DefaultConnection": "User Id=seu_usuario;Password=sua_senha;Data Source=seu_oracle_datasource;"
@@ -137,18 +166,10 @@ O sistema utiliza mensageria para comunicação entre os componentes, garantindo
         }
       }
     }
-    
-    ```
 
 3.  Execute o serviço
 
-
-
-    ```
     dotnet run
-    
-    ```
-
 
 ## 📊 Documentação dos Endpoints
 

@@ -12,15 +12,13 @@ namespace AlertNotificationService.Service;
     public class RabbitMQConsumer : BackgroundService
     {
         private readonly IConfiguration _configuration;
-        private readonly AlertProcessor _alertProcessor;
         private readonly string _queueName = "disaster_alerts";
         private IConnection _connection;
         private IModel _channel;
         
-        public RabbitMQConsumer(IConfiguration configuration, AlertProcessor alertProcessor)
+        public RabbitMQConsumer(IConfiguration configuration)
         {
             _configuration = configuration;
-            _alertProcessor = alertProcessor;
             
             InitializeRabbitMQ();
         }
@@ -71,8 +69,6 @@ namespace AlertNotificationService.Service;
                 {
                     message = Encoding.UTF8.GetString(ea.Body.ToArray());
                     var alertMessage = JsonSerializer.Deserialize<AlertMessageDto>(message);
-                    
-                    await _alertProcessor.ProcessAlertAsync(alertMessage, ea.RoutingKey);
                     
                     _channel.BasicAck(ea.DeliveryTag, false);
                 }

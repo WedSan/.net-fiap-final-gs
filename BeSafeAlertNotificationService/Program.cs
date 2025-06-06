@@ -52,7 +52,6 @@ namespace AlertNotificationService
                         options.UseOracle(configuration.GetConnectionString("DefaultConnection")));
               
                     services.AddSingleton<AzureEmailService>();
-                    services.AddScoped<AlertProcessor>();
                     services.AddHostedService<RabbitMQConsumer>();
                 });
     }
