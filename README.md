@@ -107,7 +107,7 @@ CREATE TABLE GS_ALERTA(
 1.  Clone o repositório
 
 
-    git clone https://github.com/wedsan/disaster-alert-system.git
+    git clone https://github.com/WedSan/.net-fiap-final-gs.git
     cd .net-fiap-final-gs/BeSafe
 
 2.  Configure a string de conexão no arquivo  `appsettings.json`
