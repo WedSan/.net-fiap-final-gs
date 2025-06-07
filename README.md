@@ -94,7 +94,8 @@ Essa camada de inteligência ajuda o **BeSafe** a ser mais proativo, prevenindo 
 ### Modelagem Banco
 ![modelagem](https://i.ibb.co/SXTq6S6y/Screenshot-3.png)
 
-```CREATE TABLE GS_USUARIO(
+```
+CREATE TABLE GS_USUARIO(
     ID INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     NOME VARCHAR2(255) NOT NULL,
     CPF VARCHAR2(11),
