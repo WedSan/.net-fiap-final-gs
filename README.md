@@ -256,6 +256,5 @@ O sistema registra logs detalhados de todas as operações, facilitando o diagn�
 
 ## 🔐 Segurança
 
--   Todas as comunicações são protegidas usando HTTPS
 -   As credenciais são armazenadas de forma segura em arquivos de configuração
 -   O acesso à API pode ser protegido usando autenticação JWT (implementação opcional)
