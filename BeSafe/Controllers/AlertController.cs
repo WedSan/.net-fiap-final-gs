@@ -10,7 +10,7 @@ using BeSafe.Services;
 [Route("api/[controller]")]
 public class AlertController : ControllerBase
 {
-      private readonly IAlertRepository _alertRepository;
+    private readonly IAlertRepository _alertRepository;
     private readonly RabbitMQService _rabbitMQService;
     private readonly ILogger<AlertController> _logger;
     

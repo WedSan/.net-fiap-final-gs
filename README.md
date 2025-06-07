@@ -51,14 +51,50 @@ O sistema utiliza mensageria para comunicação entre os componentes, garantindo
 -   [RabbitMQ](https://www.rabbitmq.com/download.html)  instalado e rodando
 -   Conta no  [Azure Communication Services](https://azure.microsoft.com/pt-br/services/communication-services/)  com domínio de email verificado
 
+## 🧠 Uso de Machine Learning com C# e ML.NET
+
+O projeto **BeSafe** utiliza a biblioteca **ML.NET**, nativa do .NET, para aplicar **detecção de anomalias** nos alertas recebidos. O objetivo é identificar padrões fora do comum que possam indicar situações emergenciais críticas ou dados inconsistentes ⚠️🤖.
+
+A detecção é feita com o algoritmo **Randomized PCA (Principal Component Analysis)**, que analisa características dos alertas como o tipo, horário e dia do envio, e determina se um alerta é “normal” ou está fora do padrão esperado.
+
+### 📌 Como funciona na prática
+
+No código da classe `AlertAnomalyPredictor`, os dados de alertas são transformados em um formato de entrada com os seguintes atributos:
+
+- `TipoAlerta`: convertido para número (por exemplo, 1 = enchente, 2 = deslizamento…)
+- `DiaDoEnvio` e `HoraDoEnvio`: usados para capturar padrões temporais
+- Esses dados são combinados em vetores e analisados pelo modelo
+
+### 🔍 Exemplo de uso com ML.NET
+
+```csharp
+var pipeline = _mlContext.Transforms
+    .Concatenate("Features", nameof(AlertFeature.TipoAlerta), nameof(AlertFeature.DiaDoEnvio), nameof(AlertFeature.HoraDoEnvio))
+    .Append(_mlContext.AnomalyDetection.Trainers.RandomizedPca("Features", rank: 2));
+
+var model = pipeline.Fit(dataView);
+var transformedData = model.Transform(dataView);
+
+var predictions = _mlContext.Data
+    .CreateEnumerable<AlertAnomalyPrediction>(transformedData, reuseRowObject: false)
+    .ToList();
+ ```
+### 🎯 Benefícios dessa abordagem
+
+- ✅ **Automação Inteligente**: Detecta alertas atípicos automaticamente sem regras fixas
+- 🚀 **Eficiência**: Permite respostas mais rápidas a eventos críticos
+- 📈 **Escalabilidade**: Pode ser ajustado conforme o volume de dados cresce
+- 💸 **Custo-benefício**: Integração 100% em C#, sem dependências externas
+
+Essa camada de inteligência ajuda o **BeSafe** a ser mais proativo, prevenindo e respondendo a eventos extremos com mais precisão 🌪️🌊🧠.
+
 ### Configuração do Banco de Dados
 
 1.  Execute os scripts SQL fornecidos para criar as tabelas e inserir dados iniciais:
 ### Modelagem Banco
 ![modelagem](https://i.ibb.co/SXTq6S6y/Screenshot-3.png)
 
- ```
- CREATE TABLE GS_USUARIO(
+```CREATE TABLE GS_USUARIO(
     ID INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     NOME VARCHAR2(255) NOT NULL,
     CPF VARCHAR2(11),
