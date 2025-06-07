@@ -236,6 +236,10 @@ CREATE TABLE GS_ALERTA(
 -   **PUT**  `/api/Alert/{id}`  - Atualiza um alerta existente
 -   **DELETE**  `/api/Alert/{id}`  - Remove um alerta
 
+#### 🤖 Machine Learning
+
+-   **GET**  `/api/machine_learning`  - Detecta anomalias nos alertas usando ML para identificar padrões atípicos e melhorar a precisão das notificações
+
 ## 📨 Fluxo de Envio de Alertas
 
 1.  Um operador cadastra um alerta através da API Principal
